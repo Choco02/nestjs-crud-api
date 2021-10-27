@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: rgb(19, 22, 24);
+            /* box-sizing: border-box; */
+        }
+
+        .formContainer {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 2;
+            align-items: center;
+            margin-top: 50vh;
+            /* justify-content: space-between; */
+        }
+
+
+        #id {
+            background-color: white;
+            width: 20px;
+        }
+
+        img {
+            border-radius: 10px;
+            width: 50px;
+            height: 50px;
+            float: left;
+        }
+
+        #data {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        p {
+            font-size: 20px;
+            color: white;
+        }
+
+        input {
+            border: none;
+        }
+
+
+        input:hover {
+            color: white;
+        }
+
+        .input,
+        input[type=file] {
+            margin-top: 10px;
+            width: 50vw;
+            height: 30px;
+            text-align: center;
+        }
+
+        .input {
+            border-radius: 5px;
+
+        }
+
+        .input:hover {
+            background-color: black;
+        }
+
+        #submit:hover {
+            background-color: black;
+        }
+
+        ::placeholder {
+            text-align: center;
+            font-style: bold;
+        }
+
+    </style>
+</head>
+
+<body onload="getData()">
+    <form action="" method="post">
+        <div class="formContainer">
+            <input name="name" class="input" placeholder="Nome do usuário" required>
+            <input name="phone" type="tel" class="input" placeholder="Número de telefone" required>
+            <input name="email" type="email" class="input" placeholder="email@email.com" required>
+            <input name="image" type="file" id="image" accept="image/png, image/jpeg" required>
+            <input id="submit" type="submit" value="submit">
+
+        </div>
+    </form>
+    <div id="data">
+        <!-- <div class="dataCointainer"> -->
+
+        <!-- </div> -->
+
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.23.0/axios.min.js"></script>
+
+    <script>
+        alert('Create, Read e Delete estão implementados nesse arquivo, falta Update');
+        axios.defaults.baseURL = 'http://localhost:3000'
+
+        function createData(id, image, name, email, phone) {
+            
+            return (
+                `<img src='http://localhost:3000/images/${id}/${image}' alt=${name}>`+
+                `nome: ${name} email: ${email}<br/> telefone: ${phone}<button onclick="deleteItem(event)">Remover</button>`
+            )
+        }
+
+        const data = [];
+
+        function getData() {
+            axios.get('/pessoas').then(d => {
+
+                data.push(...d.data);
+                console.log(data);
+                const container = document.getElementById('data');
+                for (const item of data) {
+                    const newItem = document.createElement('p');
+                    newItem.id = item.id;
+                    newItem.className = 'usersList';
+                    newItem.innerHTML = createData(item.id, item.image, item.name, item.email, item.phone);
+                    container.appendChild(newItem);
+                }
+            });
+        }
+
+        function submit(event) {
+            event.preventDefault();
+            console.log('Submit...');
+
+            const image = document.getElementById('image').files[0];
+            if (!image) return alert('Imagem faltando!');
+
+            const [ name, email, phone ] = [ 'name', 'email', 'phone' ]
+                .map(item => document.getElementsByName(item)[0].value);
+
+            const formData = new FormData();
+
+            formData.append('name', name);
+            formData.append('email', email);
+            formData.append('phone', phone);
+            formData.append('image', image);
+
+            axios.post('/pessoas', formData, { headers: {
+                'Content-Type': 'multipart/form-data'
+                }
+            });
+        }
+
+        const form = document.getElementsByTagName('form')[0];
+        form.addEventListener('submit', submit)
+
+        /** @param {Event} event */
+        function deleteItem(event) {
+            /** @type{HTMLParagraphElement} */
+            const parent = event.srcElement.parentElement;
+            document.getElementById('data').removeChild(parent);
+            axios.delete(`/pessoas/${parent.id}`)
+                .then(() => console.log('Deletado com sucesso'))
+                .catch(err => console.log('Algo deu errado: ', err.message));
+        }
+
+
+    </script>
+</body>
+
+</html>
