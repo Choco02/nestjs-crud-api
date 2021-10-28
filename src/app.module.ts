@@ -3,9 +3,17 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PessoasModule } from './pessoas/pessoas.module';
 import { ImagesModule } from './images/images.module';
+import { LoggerModule } from 'nestjs-pino';
+import { createWriteStream } from 'fs';
 
 @Module({
-  imports: [PessoasModule, ImagesModule],
+  imports: [
+    PessoasModule,
+    ImagesModule,
+    LoggerModule.forRoot({
+      pinoHttp: [createWriteStream('./access.log')],
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
