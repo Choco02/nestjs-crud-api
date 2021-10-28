@@ -12,6 +12,7 @@ GET /pessoas
 ```
 * Retorna todos os usuários da Db (*SELECT * FROM pessoas*) 
 
+*modo de acesso das imagens `/images/{pessoa_id}/{image}`*
 ```
 POST /pessoas
 ```
@@ -19,6 +20,10 @@ POST /pessoas
 *Recebe um body com seguintes parâmetros `name`, `email`, `phone` e uma `image`.
 Tudo enviado com *Content-Type multpart/formdata**
 
+Exemplo de request e response com Insomnia 
+
+
+![Exemplo de response](https://i.imgur.com/f74VrLB.png)
 ```
 DELETE /pessoas/:id
 ```
