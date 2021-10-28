@@ -10,6 +10,7 @@ interface IData {
   email?: string;
   phone?: string;
   image?: Express.Multer.File | string;
+  birth_date?: number;
 }
 
 const createName = (data) =>
@@ -24,6 +25,8 @@ export class PessoasService {
   async create(data: IData): Promise<Pessoa> {
     const imageBuffer = data.image as Express.Multer.File;
     data.image = createName(data);
+
+    console.log('data: ', data);
 
     const createFile = (pessoa: Pessoa) => {
       const folder = readdirSync('./').includes('dist') ? './src' : './dist';
@@ -62,11 +65,9 @@ export class PessoasService {
   async findOne(
     pessoaWhereUniqueInput: Prisma.PessoaWhereUniqueInput,
   ): Promise<Pessoa | null> {
-    const data = await this.prisma.pessoa.findUnique({
+    return this.prisma.pessoa.findUnique({
       where: pessoaWhereUniqueInput,
     });
-    // data.image = `${data.id}/${data.image}`;
-    return data;
   }
 
   async update(params: {

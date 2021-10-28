@@ -26,6 +26,7 @@ interface IData {
   email?: string;
   phone?: string;
   image?: Express.Multer.File | string;
+  birth_date?: number;
 }
 
 @Controller('pessoas')
@@ -39,7 +40,8 @@ export class PessoasController {
     @UploadedFile() image: Express.Multer.File,
     @Res({ passthrough: true }) res: Response,
   ) {
-    if (Object.values(data).length < 3) {
+    console.log('data: ', data);
+    if (Object.values(data).length < 4) {
       res
         .status(HttpStatus.BAD_REQUEST)
         .send({ message: 'Parâmetros insuficientes' });
@@ -47,6 +49,7 @@ export class PessoasController {
     }
 
     let { name, email, phone } = data;
+    const birth_date = parseInt(data.birth_date as unknown as string);
 
     if (!image) {
       res
@@ -59,7 +62,13 @@ export class PessoasController {
       simpleSanitize(item),
     );
 
-    return this.pessoasService.create({ name, email, phone, image });
+    return this.pessoasService.create({
+      name,
+      email,
+      phone,
+      image,
+      birth_date,
+    });
   }
 
   @Get()

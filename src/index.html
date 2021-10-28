@@ -79,7 +79,6 @@
             text-align: center;
             font-style: bold;
         }
-
     </style>
 </head>
 
@@ -90,6 +89,7 @@
             <input name="phone" type="tel" class="input" placeholder="Número de telefone" required>
             <input name="email" type="email" class="input" placeholder="email@email.com" required>
             <input name="image" type="file" id="image" accept="image/png, image/jpeg" required>
+            <input name="date" type="date" class="input" required>
             <input id="submit" type="submit" value="submit">
 
         </div>
@@ -106,13 +106,20 @@
         alert('Create, Read e Delete estão implementados nesse arquivo, falta Update');
         axios.defaults.baseURL = 'http://localhost:3000'
 
-        function createData(id, image, name, email, phone) {
-            
+
+        function createData(id, image, name, email, phone, date) {
+
             return (
-                `<img src='http://localhost:3000/images/${id}/${image}' alt=${name}>`+
-                `nome: ${name} email: ${email}<br/> telefone: ${phone}<button onclick="deleteItem(event)">Remover</button>`
+                `<img src='http://localhost:3000/images/${id}/${image}' alt=${name}>` +
+                `nome: ${name} email: ${email}<br/> telefone: ${phone} ` +
+                `Data de nascimento: ${formatDate(date)}` +
+                `<button onclick="deleteItem(event)">Remover</button>`
             )
         }
+
+        const formatDate = (date) => new Date(date)
+            .toUTCString().toLocaleString('pt-br')
+            .split(' ').slice(1, 4).join(' ');
 
         const data = [];
 
@@ -126,7 +133,7 @@
                     const newItem = document.createElement('p');
                     newItem.id = item.id;
                     newItem.className = 'usersList';
-                    newItem.innerHTML = createData(item.id, item.image, item.name, item.email, item.phone);
+                    newItem.innerHTML = createData(item.id, item.image, item.name, item.email, item.phone, item.birth_date);
                     container.appendChild(newItem);
                 }
             });
@@ -139,7 +146,7 @@
             const image = document.getElementById('image').files[0];
             if (!image) return alert('Imagem faltando!');
 
-            const [ name, email, phone ] = [ 'name', 'email', 'phone' ]
+            const [name, email, phone, date] = ['name', 'email', 'phone', 'date']
                 .map(item => document.getElementsByName(item)[0].value);
 
             const formData = new FormData();
@@ -148,15 +155,17 @@
             formData.append('email', email);
             formData.append('phone', phone);
             formData.append('image', image);
+            formData.append('birth_date', new Date(date).getTime());
 
-            axios.post('/pessoas', formData, { headers: {
-                'Content-Type': 'multipart/form-data'
+            axios.post('/pessoas', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
                 }
             });
         }
 
-        const form = document.getElementsByTagName('form')[0];
-        form.addEventListener('submit', submit)
+        document.getElementsByTagName('form')[0]
+            .addEventListener('submit', submit);
 
         /** @param {Event} event */
         function deleteItem(event) {
