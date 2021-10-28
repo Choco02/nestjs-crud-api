@@ -11,9 +11,10 @@ datasource db {
 }
 
 model Pessoa {
-  id    String @id @default(uuid())
-  name  String
-  email String
-  phone String
-  image String
+  id         String   @id @default(uuid())
+  name       String
+  email      String
+  phone      String
+  image      String
+  birth_date Int
 }
